@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smartphone Products</title>
+
+    <link rel="stylesheet" href="products-style.css" type="text/css" />
+
+    <script>
+        var store_name = "Eaggon Lee";
+    </script>
+
+</head>
+
+<body>
+    <header>
+        <h1>
+            <script>
+                document.write(store_name);
+            </script>'s Used Smart Phone Store
+        </h1>
+        
+        <p style="text-align: center; font-weight: bold;">
+            Hits:<span id="hits_span">0</span>
+            Spins:<span id="spins_span">0</span>
+        </p>
+    </header>
+
+    <div>
+        <main>
+            <section class="item" id="HTC" 
+                onmouseover="hits_span.innerHTML = hits; spins_span.innerHTML = spins; this.className = 'item rotate';"
+                onclick="hits_span.innerHTML = hits; spins_span.innerHTML = spins;this.className = 'item';">
+                <h2>HTC</h2>
+                <p>&dollar;40.00</p>
+                <img src=http://dport96.github.io/ITM352/morea/080.flow-control-II/HTC.jpg>
+            </section>
+            <section class="item" id="Apple"
+                onmouseover="hits_span.innerHTML = hits; spins_span.innerHTML = spins; this.className = 'item rotate';"
+                onclick="hits_span.innerHTML = hits; spins_span.innerHTML = spins; this.className = 'item';">
+                <h2>Apple</h2>
+                <p>&dollar;75.00</p>
+                <img src=http://dport96.github.io/ITM352/morea/080.flow-control-II/iphone-3gs.jpg>
+            </section>
+            <section class="item" id="Nokia"
+                onmouseover="hits_span.innerHTML = hits; spins_span.innerHTML = spins; this.className = 'item rotate';"
+                onclick="hits_span.innerHTML = hits; spins_span.innerHTML = spins;this.className = 'item';">
+                <h2>Nokia</h2>
+                <p>&dollar;35.00</p>
+                <img src=http://dport96.github.io/ITM352/morea/080.flow-control-II/Nokia.jpg>
+            </section>
+            <section class="item" id="Samsung" 
+                onmouseover="hits_span.innerHTML = hits; spins_span.innerHTML = spins; this.className = 'item rotate';"
+                onclick="hits_span.innerHTML = hits; spins_span.innerHTML = spins;this.className = 'item';">
+                <h2>Samsung</h2>
+                <p>&dollar;45.00</p>
+                <img src=http://dport96.github.io/ITM352/morea/080.flow-control-II/Samsung.jpg>
+            </section>
+            <section class="item" id="Blackberry" 
+                onmouseover="hits_span.innerHTML = hits; spins_span.innerHTML = spins; this.className = 'item rotate';"
+                onclick="hits_span.innerHTML = hits; spins_span.innerHTML = spins;this.className = 'item';">
+                <h2>Blackberry</h2>
+                <p>&dollar;10.00</p>
+                <img src=http://dport96.github.io/ITM352/morea/080.flow-control-II/Blackberry.jpg>
+            </section>
+
+        </main>
+    </div>
+    <footer>
+        <h1>Your One Stop Phone Shop -
+            <script>
+                document.write(store_name);
+            </script>'s
+        </h1>
+    </footer>
+</body>
+
+</html>
+<script>
+    var hits = 2;
+    var spins = 10;
+</script>
