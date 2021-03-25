@@ -1,0 +1,35 @@
+<script>
+        function checkQuantityTextbox(qtyTextboxObj){
+            var errs = isNonNegInt(qtyTextboxObj.value, true);
+            qty_textbox_message.innerHTML=errs.join(', ');
+        }
+        function isNonNegInt(q, returnErrors=false){
+        if(q == '') q = 0
+        var errors = []; // assume no errors at first
+        if(Number(q) != q) errors.push('Not a number!'); //Check if string is a number value
+        if(q < 0) errors.push('Negative value!'); //Check if it is non-negative
+        if(parseInt(q) != q) errors.push('Not an interger!'); //Check that it is an interger
+
+        return returnErrors ? errors : (errors.length == 0);
+    }
+
+    function displayPurchase(){
+        document.body.innerHTML = 'Thank you for ordering  things!';
+    }
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+   <label>Quantity desired:</label>
+   <input id='quantity_textbox' type="text" onkeyup="checkQuantityTextbox(this);">
+   <span id="qty_textbox_message">Enter a quantity</span>
+   <br>
+   <input type="button" onclick="displayPurchase();" value='Purchase'>
+</body>
+</html>
