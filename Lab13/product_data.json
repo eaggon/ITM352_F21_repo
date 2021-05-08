@@ -1,0 +1,15 @@
+  
+[
+    {  
+    "model":"Apple iPhone XS",  
+    "price": 790.00
+    },
+    {  
+    "model":"Samsung Galaxy",  
+    "price": 240.00  
+    },
+    {  
+        "model":"Google Pixel",  
+        "price": 440.00  
+        }
+]
