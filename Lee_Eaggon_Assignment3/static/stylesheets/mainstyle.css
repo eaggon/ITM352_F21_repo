@@ -1,0 +1,59 @@
+ /* General */
+ html {
+    font-size: 10px;
+  }
+  
+  body {
+    margin: 0 auto;
+  }
+
+  /*form styling, where each item goes*/
+  main {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content:space-evenly;
+  }
+  
+  /*typography for quantity:*/
+  .item label {
+    font-family: "Lucida Console", "Courier New", monospace;
+  }
+
+    /*where the customer puts the quantity that they want*/
+    .item input {
+    background-color: rgb(241, 241, 241);
+    border:black;
+    padding: 5px;
+    width: 80px;
+    margin-top: 5px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  /*styling the product info*/
+  section #pTag{
+    color: white;
+    background: black;
+    width: 55px;
+    height: 55px;
+    line-height: 55px;
+    text-align: center;
+    border-radius: 50%;
+    position: absolute;
+    right: 10px;
+    bottom: -3px;
+    z-index: 2000;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  section p{
+    position:absolute;
+    margin-top: 5px;
+  }
+
+   /*products image*/
+  .item img {
+    width: 360px;
+    height: 360px; 
+    display: block;
+    bottom: 30px;
+  }
