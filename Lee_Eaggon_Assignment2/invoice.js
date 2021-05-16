@@ -13,7 +13,8 @@ let generateInvoice = function (products) {
             <th style="text-align: center;" width="20%">Extended Price</th>
         </tr>`;
     let subTotal = 0;
-    for (i = 0; i < products.length; i++) {
+    for (let i = 0; i < products.length; i++) 
+    {
         if (products[i].quantity > 0) {
             //product rows
             let extended_price = products[i].quantity * products[i].price;

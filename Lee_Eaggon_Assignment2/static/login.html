@@ -37,7 +37,7 @@
             }
           </script>
           <button type="button" class="cancelbtn" onclick="redirecter()">Cancel</button>
-          <span class="register">Don't Have An Account? Register <a href="./registration.html">Here.</a></span>
+          <span class="register">Don't Have An Account? Register <a id="registerlink" href="./registration.html">Here.</a></span>
         </div>
       </form>
 
@@ -47,9 +47,11 @@
         let msg = urls.get("error");
         if(msg)
         {
-          alert(msg.toString());
-          window.history.replaceState({},document.title, "/login.html");
+            alert(msg.toString());
+            window.history.replaceState({},document.title, "/login.html?cart="+urls.get("cart"));
         }
+        registerLink = document.getElementById("registerlink");
+        registerLink.href = `./registration.html${location.search}`;
       </script>
 </body>
 </html>

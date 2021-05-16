@@ -1,1 +1,1 @@
-[{"fullName":"itm352","username":"itm352","email":"itm352@hawaii.edu","password":"$2b$10$e5O7prEqVHEUCky6vyAM4uwK55C0/r35vl.K7pIn44XYc0sckqTwu"},{"fullName":"Eaggon Lee","username":"elee","email":"eaggon@hawaii.edu","password":"$2b$10$4b/WvJrAaaq9hhiUpqKnhevu/aoiAli6cJL/YTlon1rldHDnfyOWm"}]
+[{"fullName":"itm352","username":"itm352","email":"itm352@hawaii.edu","password":"grader"}]
