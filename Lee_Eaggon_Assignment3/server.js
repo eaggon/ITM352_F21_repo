@@ -271,7 +271,7 @@ let validateUser = function (data) {
     if (checkUserExists(data.username)) {
         return { success: false, message: "Username already exists" };
     }
-    if (data.password.length <= 6) {
+    if (data.password.length < 6) {
         return {
             success: false,
             message: "Password should be at least 6 characters",
