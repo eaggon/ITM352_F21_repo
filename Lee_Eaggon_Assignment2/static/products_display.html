@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Main Page</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Cherry+Swash|Raleway" rel="stylesheet">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link href="./stylesheets/mainstyle.css" rel="stylesheet">
+</head>
+
+
+<!-- nav bar from w3 template, for future assignments-->
+<div class="w3-top">
+    <div class="w3-bar w3-white w3-wide w3-padding w3-card" id="navbaritems">
+        <a class="w3-bar-item"><b>Sweet As Art</b> by Eaggon Lee</a>
+        <a class="w3-bar-item w3-button" href="/products_display.html?category=chocolate"><b>Chocolate</b></a>
+        <a class="w3-bar-item w3-button" href="/products_display.html?category=candy"><b>Candy</b></a>
+        <a class="w3-bar-item w3-button" href="/products_display.html?category=icecream"><b>Ice cream</b></a>
+        <a class="w3-bar-item w3-button" href="/products_display.html?category=cookies"><b>Cookies</b></a>
+        <a class="w3-bar-item w3-button w3-right" href="/checkout"><b>Checkout</b></a>
+    </div>
+</div>
+
+<!--borrowed from template-->
+<header class="w3-display-container w3-content w3-wide" style="max-width:1200px;">
+    <img class="w3-image" src="./images/main.jpg" width="1200px;">
+    <div class="w3-display-middle w3-margin-top w3-center" id="usernamedisplay">
+        <h1 class="w3-xxlarge w3-text-white"><span class="w3-padding w3-black w3-opacity-min"><b>Sweet As Art
+                </b></span></h1>
+                
+    </div>
+</header>
+
+<body>
+    <div class="w3-container w3-padding">
+        <h3 class="w3-border-bottom w3-border-grey">Our Stuff</h3>
+    </div>
+    <form name="product_selection_form" action="invoice" method="POST">
+        <main id="tester">
+            <script>
+                let locationSearch = window.location.search;
+                const urlParams = new URLSearchParams(locationSearch);
+                let error = urlParams.get('error');
+                let category = urlParams.get('category');
+                category  = category ? category : "chocolate";
+                document.title = category[0].toUpperCase() + category.substring(1);
+                
+                //request the products from the server and load them into the form
+                let loadProducts =  function()
+                {
+                    fetch('/load_products/'+category)
+                    .then(response => response.json())
+                    .then(data => onProductsLoaded(data));
+                }
+                
+                //create product sections
+                let onProductsLoaded = function(products)
+                {
+                    let main = document.getElementById("tester");
+                    for (var i = 0; i < products.length; i++) {
+                        let valueText = products[i].quantity ? `value="${products[i].quantity}"` : "";
+                        let label = products[i].quantity ? "You ordered:" : "Quantity:"
+                        main.innerHTML += `
+                            <section class="item" style="margin-bottom: 80px">
+                            <div class="w3-display-container">
+                                <div class="w3-display-topleft w3-black w3-padding w3-opacity-min">${products[i].name}</div>
+                                <img src=${products[i].image}>
+                                <p id="pTag">&dollar;${products[i].price.toFixed(2)}</p>
+                                <label id="quantity_${category}_${i}_label" >${label}</label>
+                                <input type="text" width="200" placeholder="0" name="quantity_${category}_${i}" ${valueText} onkeyup="onProductValueChange(this);">
+                                <p class="w3-border-top w3-padding-16">${products[i].disc}</p>
+                            </section>
+                            `;
+                    }
+                }
+                loadProducts();
+                if(error)
+                {
+                    alert(error.toString());
+                    window.history.replaceState({},document.title, "/products_data.html?category="+category);
+                }
+            </script>
+        </main>
+        <!--checkout button-->
+        <!-- <div class="w3-top w3-padding w3-right" >
+            <input class="w3-bar-item w3-button w3-right w3-wide" type="submit" value=Checkout name="purchase_submit">
+        </div> -->
+
+    </form>
+</body>
+<footer class="w3-center w3-black w3-padding-16">
+    <p>Stolen from <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank"
+            class="w3-hover-text-green">this link</a></p>
+</footer>
+
+</html>
+
+<script>
+    //checks valid integer, makes the error array display a part of the function
+    function isNonNegInt(stringValue, returnErrors = false) {
+        if (stringValue == "") stringValue = 0;
+        errors = []; //copied from lab12
+        if (Number(stringValue) != stringValue)
+            errors.push('<font color="red">Not a number!</font>'); //number value
+        else if (stringValue < 0)
+            errors.push('<font color="red">Negative value!</font>'); //non-negative
+        else if (parseInt(stringValue) != stringValue)
+            errors.push('<font color="red">Not an integer!</font>'); //integer
+
+        return returnErrors ? errors : (errors.length == 0); //error array
+    }
+
+    //add the item to cart if a proper value was inserted into the input
+    function onProductValueChange(theTextbox) { //borrowed from example on Assignment1
+        errs = isNonNegInt(theTextbox.value, true); //valid
+        if (errs.length == 0)
+        {
+            errs = ['You ordered:'];
+            if (theTextbox.value.trim() == '') errs = ['Quantity:'];
+            let arr = theTextbox.name.split('_');
+            fetch('http://localhost:8080/add_to_cart/'+JSON.stringify({category: arr[1],product: arr[2],quantity: theTextbox.value !== "" ? parseInt(theTextbox.value) : 0}))
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById(theTextbox.name + '_label').innerHTML = errs.join(", ");
+            });
+        }  //when typing in the textbox, this will display 
+        else
+        {
+            if (theTextbox.value.trim() == '') errs = ['Quantity:'];
+            document.getElementById(theTextbox.name + '_label').innerHTML = errs.join(", ");
+        }
+    }
+
+    window.onload = function () {
+        // get the username to display it if the user is logged in
+        fetch('/username')
+        .then(response => response.json())
+        .then(data => {
+            if(data.name)
+            {
+                let elem = document.getElementById('usernamedisplay');
+                elem.innerHTML += `<h1 class="w3-xxlarge w3-text-white"><span class="w3-padding w3-black w3-opacity-min">Welcome back, ${data.name}</span></h1>`;
+                let navbar = document.getElementById('navbaritems');
+                navbar.innerHTML += `<a class="w3-bar-item w3-button w3-right" href="/logout"><b>Logout</b></a>`;
+            }
+        });
+        
+    }
+</script>
