@@ -1,5 +1,7 @@
-const saltRounds = 10;
-let bcrypt = require("bcrypt");
+// const saltRounds = 10;
+// let bcrypt = require("bcrypt");
+
+
 //taken from stackoverflow
 let isEmailValid = function (email) {
     let emailRegex =
@@ -27,17 +29,27 @@ let isEmailValid = function (email) {
 };
 
 //taken from the bcrypt documentation
+
 let encryptPassword = function (password, callback) {
-    bcrypt.hash(password, saltRounds, function (err, hash) {
-        callback(hash);
-    });
+    // bcrypt.hash(password, saltRounds, function (err, hash) {
+        // callback(hash);
+    // });
+    callback(password);
 };
 
 //taken from the bcrypt documentation
 let checkPassword = function (password, hash, callback) {
-    bcrypt.compare(password, hash).then(function (result) {
-        callback(result);
-    });
+    // bcrypt.compare(password, hash).then(function (result) {
+    //     callback(result);
+    // });
+    if(password === hash)
+    {
+        callback(true);
+    }
+    else
+    {
+        callback(false);
+    }
 };
 
 module.exports = {
