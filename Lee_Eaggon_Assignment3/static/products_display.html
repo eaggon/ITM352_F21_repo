@@ -120,7 +120,7 @@
             errs = ['You ordered:'];
             if (theTextbox.value.trim() == '') errs = ['Quantity:'];
             let arr = theTextbox.name.split('_');
-            fetch('http://localhost:8080/add_to_cart/'+JSON.stringify({category: arr[1],product: arr[2],quantity: theTextbox.value !== "" ? parseInt(theTextbox.value) : 0}))
+            fetch(document.location.origin+'/add_to_cart/'+JSON.stringify({category: arr[1],product: arr[2],quantity: theTextbox.value !== "" ? parseInt(theTextbox.value) : 0}))
             .then(response => response.json())
             .then(data => {
                 document.getElementById(theTextbox.name + '_label').innerHTML = errs.join(", ");
