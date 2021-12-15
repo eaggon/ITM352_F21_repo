@@ -38,6 +38,7 @@
                 let locationSearch = window.location.search;
                 const urlParams = new URLSearchParams(locationSearch);
                 let error = urlParams.get('error');
+                let inventaryError = urlParams.get('invError');
                 
                 //request the products from the server and load them into the form
                 let loadProducts =  function()
@@ -50,10 +51,49 @@
                 //create product sections
                 let onProductsLoaded = function(products)
                 {
+                    //if there was an inventary error, load the cart that caused it
+                    if(inventaryError)
+                    {
+                        inventaryError = JSON.parse(inventaryError);
+                        for (var k = 0; k < inventaryError.length; k++) 
+                        {
+                            let cartItem = inventaryError[k];
+                            //if the invetory is lower than the order was, load the invetory as the ordered quantity
+                            if(cartItem.error)
+                            {
+                                products[cartItem.key].quantity = products[cartItem.key].inventory;
+                                products[cartItem.key].invError = true;
+                            }
+                            //if there was enough invetory for this item, load the previous ordered quanitty
+                            else
+                            {
+                                products[cartItem.key].quantity = cartItem.quantity;
+                            }
+                        }
+                    }
                     let main = document.getElementById("tester");
-                    for (var i = 0; i < products.length; i++) {
+                    for (var i = 0; i < products.length; i++) 
+                    {
+                        //value for the quantity input
                         let valueText = products[i].quantity ? `value="${products[i].quantity}"` : "";
-                        let label = products[i].quantity ? "You ordered:" : "Quantity:"
+                        //label for the quantity input
+                        let label = products[i].quantity ? "You ordered:" : "Quantity:";
+                        //label to display the stock
+                        let stockLabel = `<span id="inventory_${i}" style="font-size: 12px;font-style: italic;opacity: 75%;">${products[i].inventory} in stock</span>`;
+                        let disabledInput = "";
+                        let invError = products[i].invError;
+                        //if there is no inventory, mark the product as out of stock and disable the input
+                        if (products[i].inventory == 0) 
+                        {
+                            stockLabel = `<span id="inventory_${i}" style="font-size: 12px;font-style: italic;color: #cc0000;">Out of stock</span>`;
+                            disabledInput = "disabled";
+                        }
+                        //if there is stock, but not as much as the user perviously ordered, highlight the stock label
+                        else if(invError)
+                        {
+                            stockLabel = `<span id="inventory_${i}" style="font-size: 12px;font-style: italic;color: red;font-weight: bold;">${products[i].inventory} in stock</span>`;
+                        }
+                        
                         main.innerHTML += `
                             <section class="item" style="margin-bottom: 80px">
                             <div class="w3-display-container">
@@ -61,13 +101,15 @@
                                 <img src=${products[i].image}>
                                 <p id="pTag">&dollar;${products[i].price.toFixed(2)}</p>
                                 <label id="quantity_${i}_label" >${label}</label>
-                                <input type="text" width="200" placeholder="0" name="quantity_${i}" ${valueText} onkeyup="onProductValueChange(this);">
+                                <input ${disabledInput} max-value="${products[i].inventory}" type="text" width="200" placeholder="0" name="quantity_${i}" ${valueText} onkeyup="onProductValueChange(this);">
+                                ${stockLabel}
                                 <p class="w3-border-top w3-padding-16">${products[i].disc}</p>
                             </section>
                             `;
                     }
                 }
                 loadProducts();
+                //if there is an error to display, send an alert with the error
                 if(error)
                 {
                     alert(error.toString());
@@ -104,15 +146,35 @@
         return returnErrors ? errors : (errors.length == 0); //error array
     }
 
+
     //add the item to cart if a proper value was inserted into the input
     function onProductValueChange(theTextbox) { //borrowed from example on Assignment1
-        errs = isNonNegInt(theTextbox.value, true); //valid
-        if (errs.length == 0)
+        let errors = isNonNegInt(theTextbox.value, true); //valid
+        if (errors.length == 0)
         {
-            errs = ['You ordered:'];
+            //invetory of item
+            let maxValue = theTextbox.getAttribute("max-value");
+            let inventorySpan = document.getElementById("inventory_" + theTextbox.name.split("_")[1]);
+            //if more is requested than is in stock, set the quantity to the invetory and highlight the stock label
+            if (parseInt(theTextbox.value) > parseInt(maxValue))
+            {
+                theTextbox.value = maxValue;
+                inventorySpan.style.color = "red";
+                inventorySpan.style.fontWeight = "bold";
+                inventorySpan.style.opacity = "100%";
+            }
+            //otherwise set the stock label's style to the normal one
+            else
+            {
+                inventorySpan.style.fontWeight = "";
+                inventorySpan.style.opacity = "75%";
+                inventorySpan.style.color = "black";
+            }
+            errors = ['You ordered:'];
         } 
-        if (theTextbox.value.trim() == '') errs = ['Quantity:'];
-        document.getElementById(theTextbox.name + '_label').innerHTML = errs.join(", ");
+        if (theTextbox.value.trim() == '') errors = ['Quantity:'];
+        //set the input label to the appropiate value
+        document.getElementById(theTextbox.name + '_label').innerHTML = errors.join(", ");
     }
 
 </script>
