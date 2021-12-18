@@ -1,3 +1,6 @@
+<!-- Author: Eaggon Lee -->
+<!-- This is an invoice page that is generated to summarize sales after checkout -->
+
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -156,7 +159,7 @@
                         }
                         else
                         {
-                            location.href = 'products_display.html';
+                            location.href = '/products_display.html';
                         }
                     }
                     else
@@ -167,6 +170,31 @@
                     }
                     
                 });
+        </script>
+        <div style="padding-left: 10px;" id="statusdiv"></div>
+        <script>
+            let updateUserInfo = function()
+            {
+                fetch('/username')
+                .then(response => response.json())
+                .then(data => {
+                    let statusdiv = document.createElement('div');
+                    statusdiv.id = "statusdiv";
+                    if(data.name)
+                    {
+                        statusdiv.innerHTML = `Status: Logged in as ${data.name}</br>Cart: ${data.cartData}`;
+                    }
+                    else
+                    {
+                        statusdiv.innerHTML = `Status: Not logged in</br>Cart: ${data.cartData}`;
+                    }
+                    document.body.appendChild(statusdiv);
+                });
+            }
+            window.onload = function () {
+                // get the username to display it if the user is logged in
+                updateUserInfo();
+            }
         </script>
     </body>
     <footer style="margin-top: 5px">

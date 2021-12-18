@@ -3,6 +3,7 @@
         "id": "choc1",
         "name": "Dig in",
         "price": 8.00,
+        "inventory": 10,
         "image": "./images/eatingbar.jpg",
         "disc": "Anticipation"
     },
@@ -11,6 +12,7 @@
         "id": "choc2",
         "name": "Hershey Style",
         "price": 9.00,
+        "inventory": 0,
         "image": "./images/hershey_art.jpg",
         "disc": "Stylish? Hershey wrapper art"
     },
@@ -19,6 +21,7 @@
         "id": "choc3",
         "name": "Choclips",
         "price": 10.00,
+        "inventory": 10,
         "image": "./images/choclips.jpg",
         "disc": "They're choclips."
     },
@@ -27,6 +30,7 @@
         "id": "choc4",
         "name": "Exposed",
         "price": 11.00,
+        "inventory": 10,
         "image": "./images/unwrapped.jpg",
         "disc": "Take a look!"
     },
@@ -35,6 +39,7 @@
         "id": "choc5",
         "name": "I just need it!",
         "price": 12.00,
+        "inventory": 10,
         "image": "./images/needit.jpg",
         "disc": "Listen to her!"
     }
@@ -43,6 +48,7 @@
         "id": "candy1",
         "name": "Bubbles",
         "price": 8.00,
+        "inventory": 10,
         "image": "./images/bubble.jpg",
         "disc": "BOOM. WOW."
     },
@@ -51,6 +57,7 @@
         "id": "candy2",
         "name": "Candy Collage",
         "price": 9.00,
+        "inventory": 10,
         "image": "./images/candycollage.jpg",
         "disc": "Yeah. It's a lot."
     },
@@ -59,6 +66,7 @@
         "id": "candy3",
         "name": "Eat Me!",
         "price": 10.00,
+        "inventory": 10,
         "image": "./images/pop_woman.jpg",
         "disc": "Say less"
     },
@@ -67,6 +75,7 @@
         "id": "candy4",
         "name": "Retro Candy Art",
         "price": 11.00,
+        "inventory": 10,
         "image": "./images/retro_candy.jpg",
         "disc": "Taking it back"
     },
@@ -75,6 +84,7 @@
         "id": "candy5",
         "name": "Ring Pop Art",
         "price": 12.00,
+        "inventory": 10,
         "image": "./images/ringpop.jpg",
         "disc": "A singular ring pop"
     }
@@ -83,6 +93,7 @@
         "id": "ice1",
         "name": "Wow Ice Cream",
         "price": 8.00,
+        "inventory": 10,
         "image": "./images/icwow.jpg",
         "disc": "It pops"
     },
@@ -91,6 +102,7 @@
         "id": "ice2",
         "name": "Licking",
         "price": 9.00,
+        "inventory": 10,
         "image": "./images/iclick.jpg",
         "disc": "The right move"
     },
@@ -99,6 +111,7 @@
         "id": "ice3",
         "name": "It's sweet",
         "price": 10.00,
+        "inventory": 10,
         "image": "./images/icsweet.jpg",
         "disc": "Obviously"
     },
@@ -107,6 +120,7 @@
         "id": "ice4",
         "name": "Super Cool",
         "price": 11.00,
+        "inventory": 10,
         "image": "./images/icsupercool.jpg",
         "disc": "Ultra cool even?"
     },
@@ -115,6 +129,7 @@
         "id": "ice5",
         "name": "Behold",
         "price": 12.00,
+        "inventory": 10,
         "image": "./images/icbehold.jpg",
         "disc": "Hold it high"
     }
@@ -123,6 +138,7 @@
         "id": "cookies1",
         "name": "Oreos",
         "price": 8.00,
+        "inventory": 10,
         "image": "./images/coreos.jpg",
         "disc": "Now with more color"
     },
@@ -131,6 +147,7 @@
         "id": "cookies2",
         "name": "Chocolate Chip",
         "price": 9.00,
+        "inventory": 10,
         "image": "./images/cchocochip.jpg",
         "disc": "Classic"
     },
@@ -139,6 +156,7 @@
         "id": "cookies3",
         "name": "Stacked",
         "price": 10.00,
+        "inventory": 10,
         "image": "./images/cstacked.jpg",
         "disc": "Pile it on"
     },
@@ -147,6 +165,7 @@
         "id": "cookies4",
         "name": "Sugar Type",
         "price": 11.00,
+        "inventory": 10,
         "image": "./images/csugar.jpg",
         "disc": "Aren't they all?"
     },
@@ -155,6 +174,7 @@
         "id": "cookies5",
         "name": "Oatmeal",
         "price": 12.00,
+        "inventory": 10,
         "image": "./images/craisin.jpg",
         "disc": "Nuts and Raisins"
     }

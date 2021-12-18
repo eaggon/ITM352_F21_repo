@@ -6,7 +6,15 @@ let session = require("express-session");
 let nodemailer = require("nodemailer");
 let rawProducts = fs.readFileSync("products_data.json");
 let products = JSON.parse(rawProducts);
-let rawUsers = fs.readFileSync("users.txt").toString();
+let rawUsers;
+try
+{
+    rawUsers = fs.readFileSync("users.txt").toString();
+}
+catch
+{
+    rawUsers = "[]";
+}
 let appUsers = rawUsers ? JSON.parse(rawUsers) : [];
 let generateInvoice = require('./invoice.js').generateInvoice;
 let {isEmailValid, checkPassword, encryptPassword} = require('./userUtils.js');
@@ -67,6 +75,8 @@ app.get("/add_to_cart/:item", function (request, response) {
         });
         if (!found) {
             product.quantity = item.quantity;
+            product.key = item.product;
+            product.category = item.category;
             request.session.cart.push(product);
         }
     }
@@ -88,13 +98,24 @@ app.get('/logout',function (req, res, next){
 
 //send back the fullname of the suer
 app.get('/username', function (req, res, next) {
+    let cartSize = 0;
+    let cartDistinct = 0;
+    let cartData = "Your cart is currently empty";
+    if(req.session.cart && req.session.cart.length > 0)
+    {
+        for (let i = 0; i < req.session.cart.length; i++) {
+            cartSize += parseInt(req.session.cart[i].quantity);
+        }
+        cartDistinct = req.session.cart.length;
+        cartData = `Your cart contains ${cartDistinct} distinct items (${cartSize} items in total)`;
+    }
     if(req.session.user)
     {
-        res.json({name: req.session.user.fullName});
+        res.json({name: req.session.user.fullName, cartData: cartData });
     }
     else
     {
-        res.json({name: ""});
+        res.json({name: "", cartData: cartData});
     }
 });
 
@@ -103,9 +124,22 @@ app.get('/checkout', function (req, res, next){
         res.redirect(
             encodeURI("products_display.html?error=Your cart is empty")
         );
+        return;
     //if the user is not logged redirect to login
-    } else if (!req.session.user) {
-        console.log(req.session.cart);
+    }
+    let validator = validateInventory(req.session.cart);
+    let inventoryError = validator.inventoryError;
+    let inventoryNames = validator.inventoryNames;
+    req.session.cart = validator.cart;
+    if(inventoryError)
+    {
+        let inventoryMessage = "Your order exceeds our inventory for the following items: " + inventoryNames.join(', ');
+        res.redirect(
+            encodeURI("products_display.html?error=" + inventoryMessage + "&invError="+JSON.stringify(req.session.cart))
+        );
+        return;
+    }
+    if (!req.session.user) {
         res.redirect("/login.html");
     //mailing taken from assignment 3 examples
     } else {
@@ -134,8 +168,36 @@ app.get("/invoice", function (req, res, next) {
             encodeURI("products_display.html?error=Your cart is empty")
         );
     //if the user is not logged redirect to login
-    } else if (!req.session.user) {
-        console.log(req.session.cart);
+    }
+    
+    //validate that there is enough currently enough inventory to satisfy quantities in the cart
+    let validator = validateInventory(req.session.cart);
+    let inventoryError = validator.inventoryError;
+    let inventoryNames = validator.inventoryNames;
+    req.session.cart = validator.cart;
+    
+    //if there is not enough inventory, redirect to the store with an error message and the cart to the user keeps their valid purchases
+    if(inventoryError)
+    {
+        let inventoryMessage = "";
+        //if the user requesting the invoice was new, let them know their account has been created, despite lack of inventory for their cart
+        if(isNewUser)
+        {
+            inventoryMessage += "Your account has been registered successfully. ";
+            inventoryMessage += "However, your order exceeds our inventory for the following items: ";
+            inventoryMessage += inventoryNames.join(', ');
+        }
+        else
+        {
+            inventoryMessage += "Your order exceeds our inventory for the following items: ";
+            inventoryMessage += inventoryNames.join(', ');
+        }
+        res.redirect(
+            encodeURI("products_display.html?error=" + inventoryMessage + "&invError="+JSON.stringify(req.session.cart))
+        );
+    }
+    
+    if (!req.session.user) {
         res.redirect("login.html");
     //mailing taken from assignment 3 examples
     } else {
@@ -144,20 +206,23 @@ app.get("/invoice", function (req, res, next) {
         let invoice_str = generateInvoice(shopping_cart);
         invoice_str += `<h2 style="margin: auto;padding-top: 20px;">Thank you for shopping with us, ${user.fullName}</h2>`;
         //empty the cart
-        req.session.cart = [];
+        
         // Set up mail server. Only will work on UH Network due to security restrictions
         var transporter = nodemailer.createTransport({
-            host: "mail.hawaii.edu",
-            port: 25,
+            service: 'gmail',
             secure: false, // use TLS
             tls: {
                 // do not fail on invalid certs
                 rejectUnauthorized: false,
             },
+            auth: {
+                user: 'sweetshopitm@gmail.com',
+                pass: 'sweetshopitm152'
+            }
         });
 
         var mailOptions = {
-            from: "candy_store@bogus.com",
+            from: "Sweets shop",
             to: user.email,
             subject: "Your sweet as art invoice",
             html: invoice_str,
@@ -169,6 +234,12 @@ app.get("/invoice", function (req, res, next) {
                     `<br><div style="text-align: center;">There was an error and your invoice could not be emailed :(</div><br><div style="text-align: center;"><a href="/products_display.html">Continue shopping</a></div>`;
             } else {
                 invoice_str += `<br><div style="text-align: center;">Your invoice was mailed to ${user.email}</div><br><div style="text-align: center;"><a href="/products_display.html">Continue shopping</a></div>`;
+                for (let i = 0; i < shopping_cart.length; i++) {
+                    products[shopping_cart[i].category][shopping_cart[i].key].inventory -= shopping_cart[i].quantity;
+                    delete products[shopping_cart[i].category][shopping_cart[i].key].quantity;
+                }
+                req.session.cart = [];
+                delete req.session.user;
             }
             res.send(invoice_str);
         });
@@ -244,6 +315,26 @@ app.get("/load_cart", function (request, response, next) {
         response.json(cart);
     }
 });
+
+//takes in the cart and validates if there is enough stock for each item
+let validateInventory = function(cart)
+{
+    let inventoryError = false;
+    let inventoryNames = [];
+    for(let i = 0; i < cart.length; i++)
+    {
+        let quantity = parseInt(cart[i].quantity);
+        let prod = products[cart[i].category][cart[i].key];
+        if(quantity > parseInt(prod.inventory))
+        {
+            inventoryError = true;
+            inventoryNames.push(prod.name);
+            cart[i].error = true;
+            cart[i].quantity = prod.inventory;
+        }
+    }
+    return {cart: cart, inventoryError: inventoryError, inventoryNames: inventoryNames};
+}
 
 let writeUsers = async function () {
     await fs.promises.writeFile("users.txt", JSON.stringify(appUsers));

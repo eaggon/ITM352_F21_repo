@@ -1,3 +1,6 @@
+<!-- Author: Eaggon Lee -->
+<!-- This is a generic login page -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,6 +53,18 @@
           alert(msg.toString());
           window.history.replaceState({},document.title, "/login.html");
         }
+        window.onload = function () {
+          // get the username to display it if the user is logged in
+          fetch('/username')
+          .then(response => response.json())
+          .then(data => {
+              if(data.name)
+              {
+                  window.location = '/products_display.html';
+              }
+          });
+          
+      }
       </script>
 </body>
 </html>

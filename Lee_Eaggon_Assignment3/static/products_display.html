@@ -1,3 +1,5 @@
+<!-- Author: Eaggon Lee -->
+<!-- This site is a store that allows user to purchase items from a store -->
 <!DOCTYPE html>
 <html>
 
@@ -9,7 +11,6 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link href="./stylesheets/mainstyle.css" rel="stylesheet">
 </head>
-
 
 <!-- nav bar from w3 template, for future assignments-->
 <div class="w3-top">
@@ -43,6 +44,7 @@
                 let locationSearch = window.location.search;
                 const urlParams = new URLSearchParams(locationSearch);
                 let error = urlParams.get('error');
+                let inventaryError = urlParams.get('invError');
                 let category = urlParams.get('category');
                 category  = category ? category : "chocolate";
                 document.title = category[0].toUpperCase() + category.substring(1);
@@ -58,10 +60,43 @@
                 //create product sections
                 let onProductsLoaded = function(products)
                 {
+                    if(inventaryError)
+                    {
+                        inventaryError = JSON.parse(inventaryError);
+                        console.log(inventaryError);
+                        for (var k = 0; k < inventaryError.length; k++) 
+                        {
+                            let cartItem = inventaryError[k];
+                            console.log("CARTITM",cartItem);
+                            //if the invetory is lower than the order was, load the invetory as the ordered quantity
+                            if(cartItem.error)
+                            {
+                                products[cartItem.key].invError = true;
+                            }
+                        }
+                    }
                     let main = document.getElementById("tester");
                     for (var i = 0; i < products.length; i++) {
+                        //value for the quantity input
                         let valueText = products[i].quantity ? `value="${products[i].quantity}"` : "";
-                        let label = products[i].quantity ? "You ordered:" : "Quantity:"
+                        //label for the quantity input
+                        let label = products[i].quantity ? "You ordered:" : "Quantity:";
+                        //label to display the stock
+                        let stockLabel = `<span id="inventory_${category}_${i}" style="font-size: 12px;font-style: italic;opacity: 75%;">${products[i].inventory} in stock</span>`;
+                        let disabledInput = "";
+                        let invError = products[i].invError;
+                        //if there is no inventory, mark the product as out of stock and disable the input
+                        if (products[i].inventory == 0) 
+                        {
+                            stockLabel = `<span id="inventory_${category}_${i}" style="font-size: 12px;font-style: italic;color: #cc0000;">Out of stock</span>`;
+                            disabledInput = "disabled";
+                        }
+                        //if there is stock, but not as much as the user perviously ordered, highlight the stock label
+                        else if(invError)
+                        {
+                            stockLabel = `<span id="inventory_${category}_${i}" style="font-size: 12px;font-style: italic;color: red;font-weight: bold;">${products[i].inventory} in stock</span>`;
+                        }
+                        
                         main.innerHTML += `
                             <section class="item" style="margin-bottom: 80px">
                             <div class="w3-display-container">
@@ -69,7 +104,8 @@
                                 <img src=${products[i].image}>
                                 <p id="pTag">&dollar;${products[i].price.toFixed(2)}</p>
                                 <label id="quantity_${category}_${i}_label" >${label}</label>
-                                <input type="text" width="200" placeholder="0" name="quantity_${category}_${i}" ${valueText} onkeyup="onProductValueChange(this);">
+                                <input ${disabledInput} max-value="${products[i].inventory}" type="text" width="200" placeholder="0" name="quantity_${category}_${i}" ${valueText} onkeyup="onProductValueChange(this);">
+                                ${stockLabel}
                                 <p class="w3-border-top w3-padding-16">${products[i].disc}</p>
                             </section>
                             `;
@@ -89,6 +125,7 @@
         </div> -->
 
     </form>
+    <div style="padding-left: 10px;" id="statusdiv"></div>
 </body>
 <footer class="w3-center w3-black w3-padding-16">
     <p>Stolen from <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank"
@@ -115,37 +152,72 @@
     //add the item to cart if a proper value was inserted into the input
     function onProductValueChange(theTextbox) { //borrowed from example on Assignment1
         errs = isNonNegInt(theTextbox.value, true); //valid
+        if (errors.length == 0)
+        {
+            //invetory of item
+            let maxValue = theTextbox.getAttribute("max-value");
+            let inventorySpan = document.getElementById("inventory_" + theTextbox.name.split("_")[1] + "_" + theTextbox.name.split("_")[2]);
+            //if more is requested than is in stock, set the quantity to the invetory and highlight the stock label
+            if (parseInt(theTextbox.value) > parseInt(maxValue))
+            {
+                theTextbox.value = maxValue;
+                inventorySpan.style.color = "red";
+                inventorySpan.style.fontWeight = "bold";
+                inventorySpan.style.opacity = "100%";
+            }
+            //otherwise set the stock label's style to the normal one
+            else
+            {
+                inventorySpan.style.fontWeight = "";
+                inventorySpan.style.opacity = "75%";
+                inventorySpan.style.color = "black";
+            }
+        }
+        let cartValue = theTextbox.value;
         if (errs.length == 0)
         {
             errs = ['You ordered:'];
-            if (theTextbox.value.trim() == '') errs = ['Quantity:'];
+            if (cartValue.trim() == '') errs = ['Quantity:'];
             let arr = theTextbox.name.split('_');
-            fetch(document.location.origin+'/add_to_cart/'+JSON.stringify({category: arr[1],product: arr[2],quantity: theTextbox.value !== "" ? parseInt(theTextbox.value) : 0}))
+            fetch(document.location.origin+'/add_to_cart/'+JSON.stringify({category: arr[1],product: arr[2],quantity: cartValue !== "" ? parseInt(cartValue) : 0}))
             .then(response => response.json())
             .then(data => {
                 document.getElementById(theTextbox.name + '_label').innerHTML = errs.join(", ");
+                updateUserInfo();
             });
         }  //when typing in the textbox, this will display 
         else
         {
-            if (theTextbox.value.trim() == '') errs = ['Quantity:'];
+            if (cartValue.trim() == '') errs = ['Quantity:'];
             document.getElementById(theTextbox.name + '_label').innerHTML = errs.join(", ");
         }
     }
 
-    window.onload = function () {
-        // get the username to display it if the user is logged in
+    let updateUserInfo = function(init = false)
+    {
         fetch('/username')
         .then(response => response.json())
         .then(data => {
+            let statusdiv = document.getElementById("statusdiv");
             if(data.name)
             {
-                let elem = document.getElementById('usernamedisplay');
-                elem.innerHTML += `<h1 class="w3-xxlarge w3-text-white"><span class="w3-padding w3-black w3-opacity-min">Welcome back, ${data.name}</span></h1>`;
-                let navbar = document.getElementById('navbaritems');
-                navbar.innerHTML += `<a class="w3-bar-item w3-button w3-right" href="/logout"><b>Logout</b></a>`;
+                if(init)
+                {
+                    let elem = document.getElementById('usernamedisplay');
+                    elem.innerHTML += `<h1 class="w3-xxlarge w3-text-white"><span class="w3-padding w3-black w3-opacity-min">Welcome back, ${data.name}</span></h1>`;
+                    let navbar = document.getElementById('navbaritems');
+                    navbar.innerHTML += `<a class="w3-bar-item w3-button w3-right" href="/logout"><b>Logout</b></a>`;
+                }
+                statusdiv.innerHTML = `Status: Logged in as ${data.name}</br>Cart: ${data.cartData}`;
+            }
+            else
+            {
+                statusdiv.innerHTML = `Status: Not logged in</br>Cart: ${data.cartData}`;
             }
         });
-        
+    }
+    window.onload = function () {
+        // get the username to display it if the user is logged in
+        updateUserInfo(true);
     }
 </script>

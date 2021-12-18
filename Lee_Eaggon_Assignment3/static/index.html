@@ -1,3 +1,6 @@
+<!-- Author: Eaggon Lee -->
+<!-- Landing page to start navigation to the product display page -->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,6 +34,29 @@
         <img src="./images/candy_pug.jpg">
     </a>
     <h3>Poke the Pug!</h3>
+    <div style="padding-left: 10px;" id="statusdiv"></div>
+    <script>
+        let updateUserInfo = function()
+        {
+            fetch('/username')
+            .then(response => response.json())
+            .then(data => {
+                let statusdiv = document.getElementById("statusdiv");
+                if(data.name)
+                {
+                    statusdiv.innerHTML = `Status: Logged in as ${data.name}</br>Cart: ${data.cartData}`;
+                }
+                else
+                {
+                    statusdiv.innerHTML = `Status: Not logged in</br>Cart: ${data.cartData}`;
+                }
+            });
+        }
+        window.onload = function () {
+            // get the username to display it if the user is logged in
+            updateUserInfo();
+        }
+    </script>
 </body>
 
 </html>
